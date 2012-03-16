@@ -41,6 +41,48 @@
     CFRelease(systemElementRef_);
 }
 
+- (BOOL) getAllWindows:(SIWindowsRef *)appWindows error:(NSError **)error {
+    FMTAssertNotNil(appWindows);
+    
+    //get the focused application
+    AXUIElementRef focusedAppRef = nil;
+    CFArrayRef focusedAppWindowsRef = nil;
+    AXError ret = 0;
+    
+    if ((ret = AXUIElementCopyAttributeValue(systemElementRef_,
+                                             (CFStringRef) kAXFocusedApplicationAttribute,
+                                             (CFTypeRef *) &focusedAppRef)) != kAXErrorSuccess) {
+        if (error)
+            *error = SICreateError(FMTStr(@"AXError: kAXFocusedApplicationAttribute copy failed: %d", ret), kAXFailureErrorCode);
+        return NO;
+    }    
+    FMTAssertNotNil(focusedAppRef);
+    
+    NSLog(@"Focused App --- %@",focusedAppRef);
+    
+    
+    //get all windows for focused app
+    if ((ret = AXUIElementCopyAttributeValue((AXUIElementRef)focusedAppRef,
+                                             (CFStringRef)kAXWindowsAttribute,
+                                             (CFTypeRef*)appWindows)) != kAXErrorSuccess) {
+        if (error)
+            *error = SICreateError(FMTStr(@"AXError: kAXWindowsAttribute copy failed: %d", ret), kAXFailureErrorCode);
+        CFRelease(focusedAppRef);
+        return NO;
+    }
+    /*
+    for (int i = 0; i < (int)CFArrayGetCount(focusedAppWindowsRef); i++) {
+        NSLog(@"hello: %@",CFArrayGetValueAtIndex(focusedAppWindowsRef,i));
+        appWindows = focusedAppWindowsRef;
+    }
+    
+    NSLog(@"Focused App Windows --- %@",focusedAppWindowsRef);
+    */
+    
+    return YES;
+   
+}
+
 - (BOOL) getFocusedWindow:(SIWindowRef *)windowRef error:(NSError **)error {  
     FMTAssertNotNil(windowRef);
     
@@ -56,6 +98,7 @@
         return NO;
     }    
     FMTAssertNotNil(focusedAppRef);
+    
     
     //get the focused window
     if ((ret = AXUIElementCopyAttributeValue((AXUIElementRef)focusedAppRef,

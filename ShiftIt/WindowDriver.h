@@ -13,6 +13,8 @@
 
 - (BOOL) getFocusedWindow:(SIWindowRef *)windowRef error:(NSError **)error;
 
+- (BOOL) getAllWindows:(SIWindowsRef *)appWindows error:(NSError **)error;
+
 - (void) freeWindow:(SIWindowRef)windowRef;
 
 - (BOOL) setWindow:(SIWindowRef)windowRef position:(NSPoint)position error:(NSError **)error;

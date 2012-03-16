@@ -252,6 +252,7 @@ extern short GetMBarHeight(void);
 
 - (void) dealloc {
     for (SIWindow *window in windows_) {
+        NSLog(@"____________________ %@",window);
         [driver_ freeWindow:[window ref_]];
     }
     
@@ -261,12 +262,17 @@ extern short GetMBarHeight(void);
     [super dealloc];
 }
 
+
 - (BOOL) getFocusedWindow:(SIWindow **)window error:(NSError **)error {
     SIWindowRef windowRef = nil;
     
     if (![driver_ getFocusedWindow:&windowRef error:error]) {
         return NO;
     }
+    
+    //NSEnumerator *cws;
+    //cws = [[driver_ childWindows] objectEnumerator];
+    //NSLog(@"How Many child Windows? %d", (int)[[driver_ childWindows] count]);  
     
     
     NSRect windowRect = NSMakeRect(0, 0, 0, 0); // window rect
@@ -295,33 +301,61 @@ extern short GetMBarHeight(void);
         }
     }
     
-//    BOOL flag;
-//    
-//    // check if it is moveable
-//    if (![driver_ canWindow:window move:&flag error:&cause]) {
-//        *error = SICreateErrorWithCause(@"Unable to check if window is moveable", kWindowManagerFailureErrorCode, cause);
-//        return NO;        
-//    }
-//    if (!flag) {
-//        FMTLogInfo(@"Window is not moveable");
-//        return YES;
-//    }
-//    
-//    // check if it is moveable
-//    if (![driver_ canWindow:window resize:&flag error:&cause]) {
-//        *error = SICreateErrorWithCause(@"Unable to check if window is resizeable", kWindowManagerFailureErrorCode, cause);
-//        return NO;        
-//    }
-//    if (!flag) {
-//        FMTLogInfo(@"Window is not resizeable");
-//        return YES;
-//    }
-
+    //    BOOL flag;
+    //    
+    //    // check if it is moveable
+    //    if (![driver_ canWindow:window move:&flag error:&cause]) {
+    //        *error = SICreateErrorWithCause(@"Unable to check if window is moveable", kWindowManagerFailureErrorCode, cause);
+    //        return NO;        
+    //    }
+    //    if (!flag) {
+    //        FMTLogInfo(@"Window is not moveable");
+    //        return YES;
+    //    }
+    //    
+    //    // check if it is moveable
+    //    if (![driver_ canWindow:window resize:&flag error:&cause]) {
+    //        *error = SICreateErrorWithCause(@"Unable to check if window is resizeable", kWindowManagerFailureErrorCode, cause);
+    //        return NO;        
+    //    }
+    //    if (!flag) {
+    //        FMTLogInfo(@"Window is not resizeable");
+    //        return YES;
+    //    }
+    
     
     SIScreen *screen = [ShiftItWindowManager chooseScreenForWindowGeometry_:geometry];
     *window = [[SIWindow alloc] initWithRef:windowRef windowRect:windowRect drawersRect:drawersRect screen:screen];
     [windows_ addObject:[*window retain]];
     
+    return YES;
+}
+
+
+
+
+
+- (BOOL) getAllWindows:(SIWindows **)windows error:(NSError **)error {
+    SIWindowsRef windowsRef = nil;
+    
+    if (![driver_ getAllWindows:&windowsRef error:error]) {
+        return NO;
+    }
+
+    for (int i = 0; i < (int)CFArrayGetCount(windowsRef); i++) {
+        NSLog(@"hello: %@",CFArrayGetValueAtIndex(windowsRef,i));
+        SIWindow *window = CFArrayGetValueAtIndex(windowsRef,i);
+        BOOL res = [self getFocusedWindow:&window error:error];
+        NSLog(@"REs: %@",res);
+         
+    }
+
+    /*
+    SIScreen *screen = [ShiftItWindowManager chooseScreenForWindowGeometry_:geometry];
+    *window = [[SIWindow alloc] initWithRef:windowRef windowRect:windowRect drawersRect:drawersRect screen:screen];
+    [windows_ addObject:[*window retain]];
+    */
+      
     return YES;
 }
 

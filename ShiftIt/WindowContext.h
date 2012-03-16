@@ -10,6 +10,7 @@
 #import "ShiftIt.h"
 
 typedef void* SIWindowRef;
+typedef void* SIWindowsRef;
 
 @interface SIScreen : NSObject {
 @private
@@ -43,7 +44,22 @@ typedef void* SIWindowRef;
 
 @end
 
+
+@interface SIWindows : NSArray {
+@private	
+    SIWindowsRef ref_;
+    SIScreen *screen_;
+}
+
+@property (readonly) SIScreen *screen;
+
+@end
+
+
+
 @protocol WindowContext <NSObject>
+
+- (BOOL) getAllWindows:(SIWindows **)windows error:(NSError **)error;
 
 - (BOOL) getFocusedWindow:(SIWindow **)window error:(NSError **)error;
 

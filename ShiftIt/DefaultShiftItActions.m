@@ -321,7 +321,16 @@ const SimpleShiftItActionBlock shiftItReduce = ^NSRect(NSRect windowRect,NSSize 
     FMTAssertNotNil(error);
     
     NSError *cause = nil;
+    SIWindows *windows = nil;
     SIWindow *window = nil;
+    
+    
+    if(![windowContext getAllWindows:&windows error:&cause]) {
+        *error = SICreateErrorWithCause(@"Unable to get active window", 
+                                        kShiftItActionFaiureErrorCode, 
+                                        cause);
+        return NO;
+    }
     
     if(![windowContext getFocusedWindow:&window error:&cause]) {
         *error = SICreateErrorWithCause(@"Unable to get active window", 
